@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query
 from app.services import player_service
 from app.core.enums import PlayerFilterSet
+from app.schemas.player import PlayerCommonInfo
 
 router = APIRouter(prefix="/players", tags=["Players"])
 
@@ -24,14 +25,8 @@ async def get_players(status: PlayerFilterSet = Query(PlayerFilterSet.ALL)):
         "results": players_list
     }
 
-@router.get("{full_name}")
-async def search_player(full_name: str):
-    matching_players = player_service.search_players(full_name)
+@router.get("/{id}", response_model=PlayerCommonInfo)
+async def get_player_info(id: int):
+    player_info = player_service.get_player_common_info(id)
 
-    if not matching_players:
-        raise HTTPException(status_code=404, detail="No player found with given name")
-
-    return {
-        "count": len(matching_players),
-        "results": matching_players
-    }
+    return PlayerCommonInfo.model_validate(player_info["CommonPlayerInfo"][0])
