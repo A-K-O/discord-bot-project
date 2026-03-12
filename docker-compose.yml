@@ -1,0 +1,16 @@
+services:
+  api:
+    build: ./backend-api
+    ports:
+      - "8000:8000"
+    env_file: .env
+    volumes:
+      - ./backend-api:/app
+
+  bot:
+    build: ./discord-bot
+    depends_on:
+      - api
+    env_file: .env
+    volumes:
+      - ./discord-bot:/app
