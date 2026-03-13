@@ -7,13 +7,12 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
+    "deploy": "node deploy-commands.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "discord.js": "^14.25.1"
-  },
-  "scripts": {
-    "start": "node index.js",
-    "deploy": "node deploy-commands.js"
+    "discord.js": "^14.25.1",
+	"dotenv": "^16.4.5"
   }
 }

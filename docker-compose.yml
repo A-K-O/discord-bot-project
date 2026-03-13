@@ -14,3 +14,4 @@ services:
     env_file: .env
     volumes:
       - ./bot:/app
+      - /app/node_modules
