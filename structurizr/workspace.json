@@ -1,0 +1,305 @@
+{
+  "configuration" : { },
+  "description" : "Description",
+  "documentation" : { },
+  "id" : 1,
+  "lastModifiedAgent" : "structurizr-ui",
+  "lastModifiedDate" : "2026-03-13T20:53:35Z",
+  "model" : {
+    "people" : [ {
+      "id" : "1",
+      "name" : "User",
+      "properties" : {
+        "structurizr.dsl.identifier" : "u"
+      },
+      "relationships" : [ {
+        "description" : "Uses via Discord",
+        "destinationId" : "4",
+        "id" : "11",
+        "sourceId" : "1",
+        "tags" : "Relationship"
+      } ],
+      "tags" : "Element,Person,User"
+    } ],
+    "softwareSystems" : [ {
+      "documentation" : { },
+      "id" : "2",
+      "name" : "nba_api",
+      "properties" : {
+        "structurizr.dsl.identifier" : "na"
+      },
+      "tags" : "Element,Software System,External Service"
+    }, {
+      "documentation" : { },
+      "id" : "3",
+      "name" : "Discord Platform",
+      "properties" : {
+        "structurizr.dsl.identifier" : "da"
+      },
+      "relationships" : [ {
+        "description" : "Sends events to",
+        "destinationId" : "5",
+        "id" : "12",
+        "sourceId" : "3",
+        "tags" : "Relationship"
+      }, {
+        "description" : "Sends events to",
+        "destinationId" : "4",
+        "id" : "13",
+        "linkedRelationshipId" : "12",
+        "sourceId" : "3"
+      } ],
+      "tags" : "Element,Software System,External Service"
+    }, {
+      "containers" : [ {
+        "documentation" : { },
+        "id" : "5",
+        "name" : "Discord Bot",
+        "properties" : {
+          "structurizr.dsl.identifier" : "ss.dsb"
+        },
+        "relationships" : [ {
+          "description" : "Sends requests to",
+          "destinationId" : "6",
+          "id" : "14",
+          "sourceId" : "5",
+          "tags" : "Relationship"
+        } ],
+        "tags" : "Element,Container,Bot",
+        "technology" : "Node.js"
+      }, {
+        "documentation" : { },
+        "id" : "6",
+        "name" : "API Gateway",
+        "properties" : {
+          "structurizr.dsl.identifier" : "ss.api"
+        },
+        "relationships" : [ {
+          "description" : "HTTPS/API",
+          "destinationId" : "7",
+          "id" : "15",
+          "sourceId" : "6",
+          "tags" : "Relationship"
+        }, {
+          "description" : "HTTPS/API",
+          "destinationId" : "8",
+          "id" : "16",
+          "sourceId" : "6",
+          "tags" : "Relationship"
+        } ],
+        "tags" : "Element,Container,API Gateway",
+        "technology" : "FastAPI"
+      }, {
+        "documentation" : { },
+        "id" : "7",
+        "name" : "NBA Service",
+        "properties" : {
+          "structurizr.dsl.identifier" : "ss.ns"
+        },
+        "relationships" : [ {
+          "description" : "Cached to",
+          "destinationId" : "10",
+          "id" : "17",
+          "sourceId" : "7",
+          "tags" : "Relationship"
+        } ],
+        "tags" : "Element,Container,Service",
+        "technology" : "Python"
+      }, {
+        "documentation" : { },
+        "id" : "8",
+        "name" : "User Service",
+        "properties" : {
+          "structurizr.dsl.identifier" : "ss.us"
+        },
+        "relationships" : [ {
+          "description" : "Saved to and read from",
+          "destinationId" : "9",
+          "id" : "18",
+          "sourceId" : "8",
+          "tags" : "Relationship"
+        } ],
+        "tags" : "Element,Container,Service",
+        "technology" : "Python"
+      }, {
+        "documentation" : { },
+        "id" : "9",
+        "name" : "Database",
+        "properties" : {
+          "structurizr.dsl.identifier" : "ss.db"
+        },
+        "tags" : "Element,Container,Database",
+        "technology" : "PostgreSQL"
+      }, {
+        "documentation" : { },
+        "id" : "10",
+        "name" : "Cache",
+        "properties" : {
+          "structurizr.dsl.identifier" : "ss.c"
+        },
+        "relationships" : [ {
+          "description" : "Read from",
+          "destinationId" : "2",
+          "id" : "19",
+          "sourceId" : "10",
+          "tags" : "Relationship"
+        } ],
+        "tags" : "Element,Container,Cache",
+        "technology" : "Valkey"
+      } ],
+      "documentation" : { },
+      "id" : "4",
+      "name" : "NBA Discord Bot System",
+      "properties" : {
+        "structurizr.dsl.identifier" : "ss"
+      },
+      "relationships" : [ {
+        "description" : "Read from",
+        "destinationId" : "2",
+        "id" : "20",
+        "linkedRelationshipId" : "19",
+        "sourceId" : "4"
+      } ],
+      "tags" : "Element,Software System"
+    } ]
+  },
+  "name" : "Microservices Project",
+  "properties" : {
+    "structurizr.inspection.info" : "0",
+    "structurizr.inspection.ignore" : "0",
+    "structurizr.inspection.error" : "23",
+    "structurizr.inspection.warning" : "0",
+    "structurizr.dsl" : "IHdvcmtzcGFjZSAiTWljcm9zZXJ2aWNlcyBQcm9qZWN0IiAgewoKICAgICFpZGVudGlmaWVycyBoaWVyYXJjaGljYWwKCiAgICBtb2RlbCB7CiAgICAgICAgYXJjaGV0eXBlcyB7CiAgICAgICAgICAgIHVzZXIgPSBwZXJzb24gewogICAgICAgICAgICAgICAgdGFnICJVc2VyIgogICAgICAgICAgICB9CiAgICAgICAgICAgIHNlcnZpY2UgPSBjb250YWluZXIgewogICAgICAgICAgICAgICAgdGVjaG5vbG9neSAiUHl0aG9uIgogICAgICAgICAgICAgICAgdGFnICJTZXJ2aWNlIgogICAgICAgICAgICB9CiAgICAgICAgICAgIGRhdGFiYXNlID0gY29udGFpbmVyIHsKICAgICAgICAgICAgICAgIHRlY2hub2xvZ3kgIlBvc3RncmVTUUwiCiAgICAgICAgICAgICAgICB0YWcgIkRhdGFiYXNlIgogICAgICAgICAgICB9CiAgICAgICAgICAgIGNhY2hlID0gY29udGFpbmVyIHsKICAgICAgICAgICAgICAgIHRlY2hub2xvZ3kgIlZhbGtleSIKICAgICAgICAgICAgICAgIHRhZyAiQ2FjaGUiCiAgICAgICAgICAgIH0KICAgICAgICAgICAgYXBpZ2F0ZXdheSA9IGNvbnRhaW5lciB7CiAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJGYXN0QVBJIgogICAgICAgICAgICAgICAgdGFnICJBUEkgR2F0ZXdheSIKICAgICAgICAgICAgfQogICAgICAgICAgICBib3QgPSBjb250YWluZXIgewogICAgICAgICAgICAgICAgdGVjaG5vbG9neSAiTm9kZS5qcyIKICAgICAgICAgICAgICAgIHRhZyAiQm90IgogICAgICAgICAgICB9CiAgICAgICAgICAgIGV4dGVybmFsc2VydmljZSA9IHNvZnR3YXJlc3lzdGVtIHsKICAgICAgICAgICAgICAgIHRhZyAiRXh0ZXJuYWwgU2VydmljZSIKICAgICAgICAgICAgfQogICAgICAgIH0KCgogICAgICAgIHUgPSB1c2VyICJVc2VyIgogICAgICAgIG5hID0gZXh0ZXJuYWxzZXJ2aWNlICJuYmFfYXBpIgogICAgICAgIGRhID0gZXh0ZXJuYWxzZXJ2aWNlICJEaXNjb3JkIFBsYXRmb3JtIgoKICAgICAgICBzcyA9IHNvZnR3YXJlc3lzdGVtICJOQkEgRGlzY29yZCBCb3QgU3lzdGVtIiB7CiAgICAgICAgICAgIGRzYiA9IGJvdCAiRGlzY29yZCBCb3QiCiAgICAgICAgICAgIGFwaSA9IGFwaWdhdGV3YXkgIkFQSSBHYXRld2F5IgogICAgICAgICAgICBucyA9IHNlcnZpY2UgIk5CQSBTZXJ2aWNlIgogICAgICAgICAgICB1cyA9IHNlcnZpY2UgIlVzZXIgU2VydmljZSIKICAgICAgICAgICAgZGIgPSBkYXRhYmFzZSAiRGF0YWJhc2UiCiAgICAgICAgICAgIGMgPSBjYWNoZSAiQ2FjaGUiCiAgICAgICAgfQoKICAgICAgICB1IC0+IHNzICJVc2VzIHZpYSBEaXNjb3JkIgogICAgICAgIGRhIC0+IHNzLmRzYiAiU2VuZHMgZXZlbnRzIHRvIgogICAgICAgIHNzLmRzYiAtPiBzcy5hcGkgIlNlbmRzIHJlcXVlc3RzIHRvIgogICAgICAgIHNzLmFwaSAtPiBzcy5ucyAiSFRUUFMvQVBJIgogICAgICAgIHNzLmFwaSAtPiBzcy51cyAiSFRUUFMvQVBJIgogICAgICAgIHNzLm5zIC0+IHNzLmMgIkNhY2hlZCB0byIKICAgICAgICBzcy51cyAtPiBzcy5kYiAiU2F2ZWQgdG8gYW5kIHJlYWQgZnJvbSIKICAgICAgICBzcy5jIC0+IG5hICJSZWFkIGZyb20iCiAgICB9CiAgICAKICAgIHZpZXdzIHsKICAgICAgICBzeXN0ZW1jb250ZXh0IHNzICJEaWFncmFtMSIgewogICAgICAgICAgICBpbmNsdWRlICoKICAgICAgICAgICAgYXV0b2xheW91dCBscgogICAgICAgIH0KICAgICAgICBjb250YWluZXIgc3MgIkRpYWdyYW0yIiB7CiAgICAgICAgICAgIGluY2x1ZGUgKgogICAgICAgICAgICBhdXRvbGF5b3V0IGxyCiAgICAgICAgfQogICAgICAgIHN0eWxlcyB7CiAgICAgICAgICAgIGVsZW1lbnQgIkVsZW1lbnQiIHsKICAgICAgICAgICAgICAgIHNoYXBlIHJvdW5kZWRCb3gKICAgICAgICAgICAgfQogICAgICAgICAgICBlbGVtZW50ICJVc2VyIiB7CiAgICAgICAgICAgICAgICBzaGFwZSBwZXJzb24KICAgICAgICAgICAgfQogICAgICAgICAgICBlbGVtZW50ICJCb3QiIHsKICAgICAgICAgICAgICAgIHNoYXBlIHJvYm90CiAgICAgICAgICAgIH0KICAgICAgICAgICAgZWxlbWVudCAiRGF0YWJhc2UiIHsKICAgICAgICAgICAgICAgIHNoYXBlIGN5bGluZGVyCiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICB9Cn0g"
+  },
+  "views" : {
+    "configuration" : {
+      "branding" : { },
+      "lastSavedView" : "Diagram2",
+      "metadataSymbols" : "SquareBrackets",
+      "styles" : {
+        "elements" : [ {
+          "shape" : "Robot",
+          "tag" : "Bot"
+        }, {
+          "shape" : "Cylinder",
+          "tag" : "Database"
+        }, {
+          "shape" : "RoundedBox",
+          "tag" : "Element"
+        }, {
+          "shape" : "Person",
+          "tag" : "User"
+        } ]
+      },
+      "terminology" : { }
+    },
+    "containerViews" : [ {
+      "automaticLayout" : {
+        "applied" : true,
+        "edgeSeparation" : 0,
+        "implementation" : "Graphviz",
+        "nodeSeparation" : 300,
+        "rankDirection" : "LeftRight",
+        "rankSeparation" : 300,
+        "vertices" : false
+      },
+      "dimensions" : {
+        "height" : 1419,
+        "width" : 4550
+      },
+      "elements" : [ {
+        "id" : "2",
+        "x" : 3899,
+        "y" : 779
+      }, {
+        "id" : "3",
+        "x" : 199,
+        "y" : 479
+      }, {
+        "id" : "5",
+        "x" : 949,
+        "y" : 429
+      }, {
+        "id" : "6",
+        "x" : 1649,
+        "y" : 479
+      }, {
+        "id" : "7",
+        "x" : 2399,
+        "y" : 779
+      }, {
+        "id" : "8",
+        "x" : 2399,
+        "y" : 179
+      }, {
+        "id" : "9",
+        "x" : 3149,
+        "y" : 179
+      }, {
+        "id" : "10",
+        "x" : 3149,
+        "y" : 779
+      } ],
+      "externalSoftwareSystemBoundariesVisible" : false,
+      "key" : "Diagram2",
+      "name" : "Container View: NBA Discord Bot System",
+      "order" : 2,
+      "relationships" : [ {
+        "id" : "12"
+      }, {
+        "id" : "14"
+      }, {
+        "id" : "15"
+      }, {
+        "id" : "16"
+      }, {
+        "id" : "17"
+      }, {
+        "id" : "18"
+      }, {
+        "id" : "19"
+      } ],
+      "softwareSystemId" : "4"
+    } ],
+    "systemContextViews" : [ {
+      "automaticLayout" : {
+        "applied" : false,
+        "edgeSeparation" : 0,
+        "implementation" : "Graphviz",
+        "nodeSeparation" : 300,
+        "rankDirection" : "LeftRight",
+        "rankSeparation" : 300,
+        "vertices" : false
+      },
+      "elements" : [ {
+        "id" : "1",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "2",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "3",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "4",
+        "x" : 0,
+        "y" : 0
+      } ],
+      "enterpriseBoundaryVisible" : true,
+      "key" : "Diagram1",
+      "name" : "System Context View: NBA Discord Bot System",
+      "order" : 1,
+      "relationships" : [ {
+        "id" : "11"
+      }, {
+        "id" : "13"
+      }, {
+        "id" : "20"
+      } ],
+      "softwareSystemId" : "4"
+    } ]
+  }
+}

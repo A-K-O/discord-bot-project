@@ -15,3 +15,10 @@ services:
     volumes:
       - ./bot:/app
       - /app/node_modules
+
+  design:
+    image: structurizr/lite
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./structurizr:/usr/local/structurizr
