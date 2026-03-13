@@ -1,5 +1,10 @@
 .venv/
+venv
 __pycache__/
 *.pyc
 .pytest_cache/
 players_cache.json
+bin/
+include/
+lib/
+pyvenv.cfg
