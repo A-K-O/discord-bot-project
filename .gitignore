@@ -1,6 +1,9 @@
 config.json
 node_modules
 .DS_Store
-venv
+.venv/
+.uv/
 __pycache__/
 .env
+*.pyc
+.python-version

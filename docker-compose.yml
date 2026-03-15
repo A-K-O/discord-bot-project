@@ -6,6 +6,10 @@ services:
     env_file: .env
     volumes:
       - ./python-service:/app
+      - /app/.venv
+      - /app/__pycache__
+    environment:
+      - UV_PROJECT_ENVIRONMENT=/app/.venv
 
   bot:
     build: ./bot
