@@ -1,12 +1,27 @@
-from pydantic import BaseModel, Field, computed_field
+from typing import Optional
+from pydantic import BaseModel, Field, computed_field, AliasChoices
 
 
 class PlayerBase(BaseModel):
-    player_id: int = Field(alias="player_id", serialization_alias="playerId")
-    full_name: str = Field(alias="full_name", serialization_alias="fullName")
-    first_name: str = Field(alias="first_name", serialization_alias="firstName")
-    last_name: str = Field(alias="last_name", serialization_alias="lastName")
-    is_active: bool = Field(alias="is_active", serialization_alias="isActive")
+    player_id: int = Field(
+        validation_alias=AliasChoices("player_id", "PERSON_ID", "PLAYER_ID"),
+        serialization_alias="playerId",
+    )
+    full_name: Optional[str] = Field(
+        default=None, validation_alias="full_name", serialization_alias="fullName"
+    )
+    first_name: str = Field(
+        validation_alias=AliasChoices("first_name", "FIRST_NAME"),
+        serialization_alias="firstName",
+    )
+    last_name: str = Field(
+        validation_alias=AliasChoices("last_name", "LAST_NAME"),
+        serialization_alias="lastName",
+    )
+    is_active: bool | str = Field(
+        validation_alias=AliasChoices("is_active", "ROSTERSTATUS"),
+        serialization_alias="isActive",
+    )
 
 
 class PlayerInfo(BaseModel):
@@ -42,6 +57,11 @@ class PlayerHeadlineStats(BaseModel):
 
 
 class PlayerStatLine(BaseModel):
+    team_id: int = Field(
+        validation_alias=AliasChoices("TEAM_ID", "ORGANIZATION_ID"),
+        serialization_alias="teamID",
+    )
+    age: Optional[int] = Field(alias="AGE", serialization_alias="age")
     games_played: int = Field(alias="GP", serialization_alias="gamesPlayed")
     games_started: int = Field(alias="GS", serialization_alias="gamesStarted")
     minutes: int = Field(alias="MIN", serialization_alias="minutes")
@@ -94,19 +114,21 @@ class PlayerGameLog(PlayerStatLine):
 
 class PlayerAward(BaseModel):
     player_info: PlayerBase
-    team: str = Field(alias="TEAM", serialization_alias="team")
+    team: Optional[str] = Field(alias="TEAM", serialization_alias="team")
     description: str = Field(alias="DESCRIPTION", serialization_alias="description")
-    anba_team_number: str = Field(
+    anba_team_number: Optional[str] = Field(
         alias="ALL_NBA_TEAM_NUMBER", serialization_alias="allNBATeamNumber"
     )
     season: str = Field(alias="SEASON", serialization_alias="season")
-    month: str = Field(alias="MONTH", serialization_alias="month")
-    week: str = Field(alias="week", serialization_alias="week")
-    conference: str = Field(alias="CONFERENCE", serialization_alias="conference")
+    month: Optional[str] = Field(alias="MONTH", serialization_alias="month")
+    week: Optional[str] = Field(alias="week", serialization_alias="week")
+    conference: Optional[str] = Field(
+        alias="CONFERENCE", serialization_alias="conference"
+    )
     award_type: str = Field(alias="TYPE", serialization_alias="awardType")
     subtype1: str = Field(alias="SUBTYPE1", serialization_alias="subtype1")
-    subtype2: str = Field(alias="SUBTYPE2", serialization_alias="subtype2")
-    subtype3: str = Field(alias="SUBTYPE3", serialization_alias="subtype3")
+    subtype2: Optional[str] = Field(alias="SUBTYPE2", serialization_alias="subtype2")
+    subtype3: Optional[str] = Field(alias="SUBTYPE3", serialization_alias="subtype3")
 
 
 # Response Models

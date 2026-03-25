@@ -1,6 +1,6 @@
 from pydantic import BaseModel, TypeAdapter
-from valkey import Valkey
-from typing import TypeVar, Any, Optional, List, Union, Type
+from valkey.asyncio import Valkey
+from typing import TypeVar, Any, Optional, List, Union, Type, cast, Coroutine
 import os
 
 T = TypeVar("T", bound=BaseModel)
@@ -15,28 +15,32 @@ class CacheManager:
     def get_key(self, cache_key: str):
         return f"nba-app:{self.version}:{cache_key.lower()}"
 
-    def get_model(self, cache_key: str, model: Type[T]) -> Optional[T]:
-        data = self.client.json().get(self.get_key(cache_key))
+    async def get_model(self, cache_key: str, model: Type[T]) -> Optional[T]:
+        key = self.get_key(cache_key)
+        json_interface = self.client.json()
+        data = await cast(Coroutine[Any, Any, Any], json_interface.get(key))
 
         if data:
             try:
-                return model.model_validate(data)
+                return model.model_validate(data[0])
             except Exception:
-                self.client.delete(self.get_key(cache_key))
+                await self.client.delete(key)
         return None
 
-    def get_model_list(self, cache_key: str, model: Type[T]) -> Optional[List[T]]:
-        data = self.client.json().get(self.get_key(cache_key))
+    async def get_model_list(self, cache_key: str, model: Type[T]) -> Optional[List[T]]:
+        key = self.get_key(cache_key)
+        json_interface = self.client.json()
+        data = await cast(Coroutine[Any, Any, Any], json_interface.get(key))
 
-        if data:
+        if data and isinstance(data, list):
             try:
                 adapter = TypeAdapter(List[model])
-                return adapter.validate_python(data)
+                return adapter.validate_python(data[0])
             except Exception:
-                self.client.delete(self.get_key(cache_key))
+                await self.client.delete(key)
         return None
 
-    def set(
+    async def set(
         self,
         cache_key: str,
         data: Union[BaseModel, List[BaseModel]],
@@ -49,5 +53,14 @@ class CacheManager:
         else:
             serialized_data = data.model_dump()
 
-        self.client.json().set(key, "$", serialized_data)
-        self.client.expire(key, expire)
+        json_interface = self.client.json()
+
+        await cast(
+            Coroutine[Any, Any, Any], json_interface.set(key, "$", serialized_data)
+        )
+
+        await self.client.expire(key, expire)
+
+
+VALKEY_HOST = os.getenv("VALKEY_HOST", "valkey")
+vache = CacheManager(host=VALKEY_HOST)
