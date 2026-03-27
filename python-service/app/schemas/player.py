@@ -10,15 +10,18 @@ class PlayerBase(BaseModel):
     full_name: Optional[str] = Field(
         default=None, validation_alias="full_name", serialization_alias="fullName"
     )
-    first_name: str = Field(
+    first_name: Optional[str] = Field(
+        default=None,
         validation_alias=AliasChoices("first_name", "FIRST_NAME"),
         serialization_alias="firstName",
     )
-    last_name: str = Field(
+    last_name: Optional[str] = Field(
+        default=None,
         validation_alias=AliasChoices("last_name", "LAST_NAME"),
         serialization_alias="lastName",
     )
-    is_active: bool | str = Field(
+    is_active: Optional[bool | str] = Field(
+        default=None,
         validation_alias=AliasChoices("is_active", "ROSTERSTATUS"),
         serialization_alias="isActive",
     )
@@ -61,7 +64,7 @@ class PlayerStatLine(BaseModel):
         validation_alias=AliasChoices("TEAM_ID", "ORGANIZATION_ID"),
         serialization_alias="teamID",
     )
-    age: Optional[int] = Field(alias="AGE", serialization_alias="age")
+    age: Optional[float] = Field(alias="PLAYER_AGE", serialization_alias="age")
     games_played: int = Field(alias="GP", serialization_alias="gamesPlayed")
     games_started: int = Field(alias="GS", serialization_alias="gamesStarted")
     minutes: int = Field(alias="MIN", serialization_alias="minutes")
@@ -70,7 +73,7 @@ class PlayerStatLine(BaseModel):
     fgp: float = Field(alias="FG_PCT", serialization_alias="fgp")
     ftm: int = Field(alias="FTM", serialization_alias="ftm")
     fta: int = Field(alias="FTA", serialization_alias="fta")
-    ftp: int = Field(alias="FT_PCT", serialization_alias="ftp")
+    ftp: float = Field(alias="FT_PCT", serialization_alias="ftp")
     fg3m: int = Field(alias="FG3M", serialization_alias="fg3m")
     fg3a: int = Field(alias="FG3A", serialization_alias="fg3a")
     fg3p: float = Field(alias="FG3_PCT", serialization_alias="fg3p")
@@ -113,22 +116,29 @@ class PlayerGameLog(PlayerStatLine):
 
 
 class PlayerAward(BaseModel):
-    player_info: PlayerBase
-    team: Optional[str] = Field(alias="TEAM", serialization_alias="team")
+    team: Optional[str] = Field(default=None, alias="TEAM", serialization_alias="team")
     description: str = Field(alias="DESCRIPTION", serialization_alias="description")
     anba_team_number: Optional[str] = Field(
-        alias="ALL_NBA_TEAM_NUMBER", serialization_alias="allNBATeamNumber"
+        default=None,
+        alias="ALL_NBA_TEAM_NUMBER",
+        serialization_alias="allNBATeamNumber",
     )
     season: str = Field(alias="SEASON", serialization_alias="season")
-    month: Optional[str] = Field(alias="MONTH", serialization_alias="month")
-    week: Optional[str] = Field(alias="week", serialization_alias="week")
+    month: Optional[str] = Field(
+        default=None, alias="MONTH", serialization_alias="month"
+    )
+    week: Optional[str] = Field(default=None, alias="week", serialization_alias="week")
     conference: Optional[str] = Field(
-        alias="CONFERENCE", serialization_alias="conference"
+        default=None, alias="CONFERENCE", serialization_alias="conference"
     )
     award_type: str = Field(alias="TYPE", serialization_alias="awardType")
     subtype1: str = Field(alias="SUBTYPE1", serialization_alias="subtype1")
-    subtype2: Optional[str] = Field(alias="SUBTYPE2", serialization_alias="subtype2")
-    subtype3: Optional[str] = Field(alias="SUBTYPE3", serialization_alias="subtype3")
+    subtype2: Optional[str] = Field(
+        default=None, alias="SUBTYPE2", serialization_alias="subtype2"
+    )
+    subtype3: Optional[str] = Field(
+        default=None, alias="SUBTYPE3", serialization_alias="subtype3"
+    )
 
 
 # Response Models
@@ -143,3 +153,8 @@ class PlayerBioResponse(BaseModel):
 class PlayerStatlineResponse(BaseModel):
     basic_info: PlayerBase
     stat_info: PlayerStatLine
+
+
+class PlayerAwardResponse(BaseModel):
+    basic_info: PlayerBase
+    award_info: PlayerAward

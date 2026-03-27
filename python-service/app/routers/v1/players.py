@@ -1,8 +1,12 @@
 from fastapi import APIRouter, HTTPException, Query
 from app.services import player_service
 from app.core.enums import PlayerFilterSet
-from app.schemas.player import PlayerBioResponse, PlayerStatlineResponse
-from typing import Optional
+from app.schemas.player import (
+    PlayerAwardResponse,
+    PlayerBioResponse,
+    PlayerStatlineResponse,
+)
+from typing import List, Optional
 
 router = APIRouter(prefix="/players", tags=["Players"])
 
@@ -26,7 +30,7 @@ router = APIRouter(prefix="/players", tags=["Players"])
 @router.get("/{player_id}", response_model=PlayerBioResponse)
 async def get_player_profile(player_id: int):
     try:
-        result = await player_service.get_player_bio_test(player_id)
+        result = await player_service.get_player_bio(player_id)
 
         return result
 
@@ -39,6 +43,21 @@ async def get_player_profile(player_id: int):
     except Exception as e:
         # Log this on your terminal so you can see the traceback
         print(f"CRITICAL ERROR: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="An internal server error occurred while processing the request.",
+        )
+
+
+@router.get("/{player_id}/awards", response_model=List[PlayerAwardResponse])
+async def get_player_awards(player_id: int):
+    try:
+        result = await player_service.get_player_awards(player_id)
+
+        return result
+
+    except (ValueError, RuntimeError) as e:
+        status_code = 404 if "Could not retrieve" in str(e) else 422
         raise HTTPException(
             status_code=500,
             detail="An internal server error occurred while processing the request.",
@@ -78,25 +97,37 @@ async def get_player_profile(player_id: int):
 #             status_code=500,
 #             detail=f"An unexpected error occurred: {str(e)}"
 #         )
-#
-# @router.get("/player_id/stats/season", response_model=list[PlayerStats])
-# async def get_all_season_stats(player_id: int):
-#     try:
-#         result = await player_service.get_all_seasons(player_id)
-#
-#         return result
-#
-#     except ValueError as ve:
-#         raise HTTPException(status_code=404, detail=str(ve))
-#
-#     except RuntimeError as re:
-#         raise HTTPException(status_code=404, detail=str(re))
-#
-#     except Exception as e:
-#         raise HTTPException(
-#             status_code=500,
-#             detail=f"an unexpected error occurred: {str(e)}"
-#         )
+
+
+@router.get("/{player_id}/stats", response_model=List[PlayerStatlineResponse])
+async def get_player_stats_endpoint(
+    player_id: int,
+    # Use Query to allow testing different sets like 'SeasonTotalsRegularSeason'
+    stat_set: str = Query(default="SeasonTotalsRegularSeason"),
+    season_id: Optional[str] = Query(default=None),
+):
+    try:
+        # Call the specific test function you just wrote
+        result = await player_service.get_player_stats(
+            player_id=player_id, stat_set=stat_set, season_id=season_id
+        )
+
+        if not result:
+            raise ValueError(f"No stats found for player {player_id} in set {stat_set}")
+
+        return result
+
+    except ValueError as ve:
+        # Map validation or "not found" errors to 404/422
+        raise HTTPException(status_code=404, detail=str(ve))
+    except Exception as e:
+        # Log the full error to your terminal for debugging
+        print(f"Stats Error: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"An unexpected error occurred: {str(e)}"
+        )
+
+
 #
 # @router.get("/{player_id}/stats/season/{season_id}", response_model=PlayerStats)
 # async def get_season_stats(

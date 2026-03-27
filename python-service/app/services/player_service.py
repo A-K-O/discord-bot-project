@@ -1,17 +1,25 @@
+from os import stat
 from pydantic import TypeAdapter, ValidationError
 from typing import List, Type
 from nba_api.stats.static import players
-from nba_api.stats.endpoints import commonplayerinfo, playercareerstats, playerawards
+from nba_api.stats.endpoints import (
+    playerawards,
+    commonplayerinfo,
+    playercareerstats,
+    playerawards,
+)
 from app.core.config import NBA_HEADERS
 from .cache import vache
 from app.core.enums import PlayerCareerStatSet, PlayerFilterSet
 from app.schemas.player import (
     PlayerAward,
+    PlayerAwardResponse,
     PlayerBase,
     PlayerInfo,
     PlayerBioResponse,
     PlayerHeadlineStats,
     PlayerStatLine,
+    PlayerStatlineResponse,
 )
 
 
@@ -59,8 +67,62 @@ async def fetch_nba_data(endpoint_class, **kwargs):
 #
 #
 # # --- Live Functions ---
-#
-#
+
+
+async def get_player_stats(
+    player_id: int, stat_set: str, season_id: str | None
+) -> List[PlayerStatlineResponse]:
+    key = "player:{player_id}:{stat_set}"
+
+    if season_id:
+        key = key + f"{season_id}"
+        cached_data = await vache.get_model_list(key, PlayerStatlineResponse)
+
+    else:
+        cached_data = await vache.get_model_list(key, PlayerStatlineResponse)
+
+    if cached_data:
+        return cached_data
+
+    raw_data = await fetch_nba_data(
+        playercareerstats.PlayerCareerStats, player_id=player_id
+    )
+
+    if not raw_data:
+        raise ValueError(
+            f"Could not retrieve player career stats for player ID {player_id}"
+        )
+
+    try:
+        formatted_data = raw_data.get_normalized_dict()[stat_set]
+
+        if season_id and stat_set not in PlayerCareerStatSet:
+            target_set = (
+                (i for i in formatted_data if i["SEASON_ID"] == season_id),
+                [],
+            )
+
+        else:
+            target_set = formatted_data
+
+    except Exception as e:
+        raise ValueError(f"Could not retrieve data for stat set {stat_set}:{e}")
+
+    valid_list = []
+    for obj in target_set:
+        try:
+            stat_instance = PlayerStatlineResponse(
+                basic_info=PlayerBase.model_validate(obj),
+                stat_info=PlayerStatLine.model_validate(obj),
+            )
+            valid_list.append(stat_instance)
+        except Exception as e:
+            print(ValueError(f"Stat obj was skipped as it could not be validated: {e}"))
+
+    await vache.set(key, valid_list, 604800)
+    return valid_list
+
+
 # async def get_player_stats(
 #     player_id: int, stat_set: str, season_id: str | None = None
 # ) -> List[PlayerStatLine]:
@@ -97,30 +159,7 @@ async def fetch_nba_data(endpoint_class, **kwargs):
 #         )
 #
 #
-# async def get_player_bio(player_id: int) -> PlayerBioResponse:
-#     data = await fetch_nba_data(commonplayerinfo.CommonPlayerInfo, player_id=player_id)
-#
-#     if not data:
-#         raise ValueError(f"invalid or empty object for player ID: {player_id}")
-#
-#     try:
-#         norm_data = data.get_normalized_dict()
-#
-#         bio_data = norm_data["CommonPlayerInfo"]
-#         stats_data = norm_data["PlayerHeadlineStats"]
-#
-#         return PlayerBioResponse(
-#             basic_info=PlayerBase.model_validate(bio_data),
-#             bio_info=PlayerInfo.model_validate(bio_data),
-#             stat_info=PlayerHeadlineStats.model_validate(stats_data),
-#         )
-#     except (IndexError, ValueError) as e:
-#         raise ValueError(
-#             f"Structure of NBA data has changed or is missing for player ID {player_id}: {e}"
-#         )
-
-
-async def get_player_bio_test(player_id: int) -> PlayerBioResponse:
+async def get_player_bio(player_id: int) -> PlayerBioResponse:
     key = f"player:{player_id}:bio"
 
     cached_data = await vache.get_model(key, PlayerBioResponse)
@@ -153,15 +192,38 @@ async def get_player_bio_test(player_id: int) -> PlayerBioResponse:
     return bio_instance
 
 
-# async def get_player_awards(player_id: int) -> List[PlayerAward] | None:
-#     data = await fetch_nba_data(playerawards.PlayerAwards, player_id=player_id)
-#
-#     if not data:
-#         raise ValueError(f"invalid or empty object for player ID: {player_id}")
-#
-#     try:
-#         norm_data = data.get_normalized_dict()["PlayerAwards"]
-#         list_adapter = TypeAdapter(List[PlayerAward])
-#         return list_adapter.validate_python(norm_data)
-#     except Exception as e:
-#         raise ValidationError(f"Could not validate this data: {e}")
+async def get_player_awards(player_id: int) -> List[PlayerAwardResponse]:
+    key = f"player:{player_id}:awards"
+
+    cached_data = await vache.get_model_list(key, PlayerAwardResponse)
+
+    if cached_data:
+        return cached_data
+
+    raw_data = await fetch_nba_data(playerawards.PlayerAwards, player_id=player_id)
+
+    if not raw_data:
+        raise ValueError(
+            f"Could not retrieve player awards data for player ID {player_id}"
+        )
+
+    formatted_data = raw_data.get_normalized_dict()["PlayerAwards"]
+    valid_list = []
+
+    for obj in formatted_data:
+        try:
+            award_instance = PlayerAwardResponse(
+                basic_info=PlayerBase.model_validate(obj),
+                award_info=PlayerAward.model_validate(obj),
+            )
+            valid_list.append(award_instance)
+        except Exception as e:
+            print(
+                ValueError(
+                    f"Award obj {obj} is skipped as it could not be validated: {e}"
+                )
+            )
+            continue
+
+    await vache.set(key, valid_list, 604800)
+    return valid_list
