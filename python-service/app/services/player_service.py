@@ -72,7 +72,7 @@ async def fetch_nba_data(endpoint_class, **kwargs):
 async def get_player_stats(
     player_id: int, stat_set: str, season_id: str | None
 ) -> List[PlayerStatlineResponse]:
-    key = "player:{player_id}:{stat_set}"
+    key = f"player:{player_id}:{stat_set}"
 
     if season_id:
         key = key + f"{season_id}"
